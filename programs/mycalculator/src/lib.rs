@@ -7,36 +7,95 @@ pub mod mycalculator {
     use super::*;
 
         pub fn create(ctx:Context<Create>, init_message: String) -> Result<()> {
-            let calculator = &mut ctx.accounts.calculator ;
-            calculator.greeting = init_message ;
+                let calculator = &mut ctx.accounts.calculator ;
+                calculator.greeting = init_message ;
 
-            Ok(())
+                Ok(())
+        }
 
-    }
+        pub fn add(ctx: Context<Addition>, num1: i64, num2: i64) -> Result<()> {
+                let calculator = &mut ctx.accounts.calculator ;
+                let sum = num1  + num2 ;
 
-    pub fn add(ctx: Context<Addition>, num1: i64, num2: i64) -> Result<()> {
-        
-            Ok(())
-    }
+                calculator.result = sum ;
+                Ok(())
+        }
 
-    pub fn multiply(ctx: Context<Multiplication>, num1: i64, num2: i64) -> Result<()> {
-        
-            Ok(())
-    }
+        pub fn multiply(ctx: Context<Multiplication>, num1: i64, num2: i64) -> Result<()> {
 
-    pub fn subtract(ctx: Context<Subtraction>, num1: i64, num2: i64) -> Result<()> {
-        
-            Ok(())
-    }
+                let calculator = &mut ctx.accounts.calculator ;
 
-    pub fn divide(ctx: Context<Division>, num1: i64, num2: i64) -> Result<()> {
-        
-            Ok(())
-    }
+                let product = num1 * num2 ;
+
+                calculator.result = product ;
+
+                Ok(())
+        }
+
+        pub fn subtract(ctx: Context<Subtraction>, num1: i64, num2: i64) -> Result<()> {
+
+                let calculator = &mut ctx.accounts.calculator ;
+
+                let difference = num1 - num2 ;
+
+                calculator.result = difference ;
+
+                Ok(())
+        }
+
+        pub fn divide(ctx: Context<Division>, num1: i64, num2: i64) -> Result<()> {
+
+                let calculator  = &mut ctx.accounts.calculator ;
+
+                let result = (num1 / num2).abs() ;
+
+                let remainder = num1 % num2 ;
+
+                calculator.result = result ;
+                calculator.remainder = remainder ;
+
+                Ok(())
+        }
+
+    
+}
+
+
+
+#[account]
+pub struct Calculator {
+        pub greeting: String,
+        pub result: i64,
+        pub remainder: i64,
 }
 
 #[derive(Accounts)]
-pub struct Create {
-    #[account(mut)]
-   pub calculator: Accounts<T, Calculator>,
+pub struct Addition<'info> {
+        #[account(mut)]
+        pub calculator: Account<'info, Calculator>,
+}
+
+#[derive(Accounts)]
+pub struct Subtraction <'info> {
+        #[account(mut)]
+        pub calculator: Account<'info, Calculator> ,
+}
+#[derive(Accounts)]
+pub struct Multiplication <'info> {
+        #[account(mut)]
+        pub calculator: Account<'info, Calculator> ,
+}
+#[derive(Accounts)]
+pub struct Division <'info> {
+        #[account(mut)]
+        pub calculator: Account<'info, Calculator> ,
+}
+
+#[derive(Accounts)]
+pub struct Create <'info> {
+        #[account(init, payer = user, space = 8 + 64 + 64 + 64 + 64)]
+        pub calculator: Account< 'info, Calculator> ,
+        #[account(mut)]
+        pub user: Signer<'info>,
+        pub system_program: Program<'info, System>,
 }
